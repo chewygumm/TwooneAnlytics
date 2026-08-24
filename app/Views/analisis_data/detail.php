@@ -642,6 +642,10 @@ DETAIL CLUSTERING
 <h3 class="font-semibold mb-5 text-gray-800">
 Detail Clustering
 </h3>
+<p class="text-sm text-gray-600 mb-4">
+    Jumlah cluster optimal yang digunakan adalah 
+    <b>K = <?= count($centroid) ?></b>
+</p>
 
 <!-- JUMLAH DATA CLUSTER -->
 
@@ -820,82 +824,6 @@ Total
 </table>
 
 </div>
-<table>
-
-<!-- SILHOUETTE SCORE -->
-
-<div class="mb-8 rounded-xl bg-green-50 border border-green-200 p-5">
-
-    <h3 class="font-semibold text-gray-800 mb-3">
-        Evaluasi Hasil Clustering
-    </h3>
-
-
-    <?php 
-        $nilaiSilhouette = $evaluasi['nilai_silhouette'] ?? 0;
-    ?>
-
-
-    <div class="flex items-center justify-between">
-
-        <div>
-
-            <p class="text-sm text-gray-600">
-                Silhouette Score
-            </p>
-
-            <p class="text-3xl font-bold text-green-700">
-                <?= number_format(
-                    $nilaiSilhouette,
-                    4,
-                    '.',
-                    ''
-                ) ?>
-            </p>
-
-        </div>
-
-
-        <div class="text-right">
-
-            <?php if($nilaiSilhouette >= 0.71): ?>
-
-                <span class="px-4 py-2 rounded-full bg-green-600 text-white text-sm">
-                    Struktur Sangat Baik
-                </span>
-
-            <?php elseif($nilaiSilhouette >= 0.51): ?>
-
-                <span class="px-4 py-2 rounded-full bg-blue-600 text-white text-sm">
-                    Struktur Baik
-                </span>
-
-
-            <?php elseif($nilaiSilhouette >= 0.26): ?>
-
-                <span class="px-4 py-2 rounded-full bg-yellow-500 text-white text-sm">
-                    Struktur Lemah
-                </span>
-
-
-            <?php else: ?>
-
-                <span class="px-4 py-2 rounded-full bg-red-600 text-white text-sm">
-                    Struktur Buruk
-                </span>
-
-            <?php endif; ?>
-
-
-        </div>
-
-
-    </div>
-
-
-</div>
-
-
 
 
 </div>

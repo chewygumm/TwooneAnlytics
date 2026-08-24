@@ -967,10 +967,10 @@ $normalisasiData[]=[
 
 
         $rows = $db
-        ->table('preprocessing')
-        ->orderBy('id_preprocessing','ASC')
-        ->get()
-        ->getResultArray();
+    ->table('preprocessing')
+    ->orderBy('no_struk','ASC')
+    ->get()
+    ->getResultArray();
 
 
 
@@ -1182,32 +1182,50 @@ $centroid = [
 
 
 
-               $centroidBaru[$i]=[
+              $centroidBaru[$i]=[
 
-                'hari' =>
+            'hari' =>
+            round(
                 array_sum(array_column($anggota,'hari'))/$jumlah,
+                3
+            ),
 
 
-                'menu_kopi' =>
+            'menu_kopi' =>
+            round(
                 array_sum(array_column($anggota,'menu_kopi'))/$jumlah,
+                3
+            ),
 
 
-                'menu_non_kopi' =>
+            'menu_non_kopi' =>
+            round(
                 array_sum(array_column($anggota,'menu_non_kopi'))/$jumlah,
+                3
+            ),
 
 
-                'menu_makanan' =>
+            'menu_makanan' =>
+            round(
                 array_sum(array_column($anggota,'menu_makanan'))/$jumlah,
+                3
+            ),
 
 
-                'menu_snack' =>
+            'menu_snack' =>
+            round(
                 array_sum(array_column($anggota,'menu_snack'))/$jumlah,
+                3
+            ),
 
 
-                'total_normalisasi' =>
-                array_sum(array_column($anggota,'total_normalisasi'))/$jumlah
+            'total_normalisasi' =>
+            round(
+                array_sum(array_column($anggota,'total_normalisasi'))/$jumlah,
+                3
+            )
 
-                ];
+            ];
 
 
             }
@@ -1221,15 +1239,23 @@ $centroid = [
             for($i=0;$i<$kOptimal;$i++)
             {
 
+                $selisih = 0;
 
-                if(
-                    json_encode($centroid[$i])
-                    !=
-                    json_encode($centroidBaru[$i])
-                )
+
+                foreach($centroid[$i] as $key=>$nilai)
                 {
 
-                    $berubah=true;
+                    $selisih += abs(
+                        $nilai - $centroidBaru[$i][$key]
+                    );
+
+                }
+
+
+                if($selisih > 0.001)
+                {
+
+                    $berubah = true;
 
                     break;
 
@@ -1237,7 +1263,6 @@ $centroid = [
 
 
             }
-
 
 
            $centroid = $centroidBaru;
@@ -1638,8 +1663,54 @@ public function generate()
     // DATA CLUSTERING
     // =====================================
 
-    $dataCluster = $this->analisis->getRingkasan();
+   $dataCluster = $this->analisis->getRingkasan();
 
+// perbaiki produk dominan berdasarkan centroid akhir
+foreach($dataCluster as &$row)
+{
+
+    $centroid = $this->analisis
+        ->getCentroidByCluster($row['cluster']);
+
+
+    if($centroid)
+    {
+
+        $produk = [
+
+            "Kopi" =>
+            $centroid['menu_kopi'],
+
+            "Non-Kopi" =>
+            $centroid['menu_non_kopi'],
+
+            "Makanan" =>
+            $centroid['menu_makanan'],
+
+            "Snack" =>
+            $centroid['menu_snack']
+
+        ];
+
+
+        arsort($produk);
+
+
+        $produkDominan = array_slice(
+            array_keys($produk),
+            0,
+            2
+        );
+
+
+        $row['produk_dominan'] =
+            implode(" + ", $produkDominan);
+
+    }
+
+}
+
+unset($row);
 
     $clusterInfo = "";
 
@@ -1834,6 +1905,8 @@ Mahasiswa:
 - Jangan mengganti, menambah, atau mengurangi kategori produk.
 - maksimal 10 kata.
 - gunakan format:
+- Nama promo harus dibuat kreatif seperti kampanye marketing cafe.
+- Sesuaikan dengan karakteristik target pelanggan.
 
 [Nama Promo] - [diskon] [produk] [waktu kunjungan] [target pelanggan]
 
@@ -1849,6 +1922,16 @@ Jangan membuat:
 - kombinasi produk
 - nama segmen berdasarkan usia/status/waktu
 
+8. Penentuan target pelanggan:
+Target pelanggan ditentukan berdasarkan kesesuaian produk dominan cluster dengan distribusi produk pada ringkasan kuesioner.
+
+Contoh:
+Jika produk dominan cluster = Kopi + Makanan dan pada ringkasan kuesioner Pekerja memiliki persentase pembelian Kopi + Makanan tertinggi, maka target pelanggan = Pekerja.
+
+Waktu kunjungan ditentukan berdasarkan distribusi kunjungan target pelanggan pada ringkasan kuesioner.
+
+Contoh:
+Jika Pekerja memiliki kunjungan dominan Weekday dan periode waktu siang, maka waktu promosi = Weekday siang.
 
 FORMAT JSON:
 
@@ -2054,23 +2137,43 @@ $this->analisis->hapusInterpretasi();
 
 foreach($hasil as $row)
 {
-foreach($dataCluster as $cluster)
-{
-    if($cluster['cluster'] == $row['cluster'])
-    {
-        $row['strategi_promosi']['produk'] =
-            $cluster['produk_dominan'];
-    }
-}
-$row['strategi_promosi']['target'] =
-$this->cariTargetPromo(
-    $row['produk_dominan']
-);
 
-$row['strategi_promosi']['waktu'] =
-$this->cariWaktuPromo(
-    $row['produk_dominan']
-);
+    $hariCluster = "-";
+
+
+    foreach($dataCluster as $cluster)
+    {
+
+        if($cluster['cluster'] == $row['cluster'])
+        {
+
+            $row['strategi_promosi']['produk'] =
+                $cluster['produk_dominan'];
+
+            $hariCluster =
+                $cluster['hari_dominan'];
+
+            break;
+
+        }
+
+    }
+
+
+    $row['strategi_promosi']['target'] =
+    $this->cariTargetPromo(
+        $row['produk_dominan']
+    );
+
+
+    $row['strategi_promosi']['waktu'] =
+        $hariCluster
+        ." ".
+        $this->cariPeriodeWaktuPromo(
+        $row['strategi_promosi']['target']
+        );
+
+
     $this->analisis->simpanInterpretasi([
 
     // ubah C1,C2,C3,C4 menjadi 0,1,2,3
@@ -2581,43 +2684,27 @@ private function getDistribusiKuesioner()
     return $hasil;
 
 }
-private function cariWaktuPromo($produk)
+private function cariPeriodeWaktuPromo($target)
 {
     $distribusi = $this->getDistribusiKuesioner();
 
-    $produk = strtolower(str_replace(' ','',$produk));
 
-    $waktuTerbesar = "-";
-    $nilaiTertinggi = 0;
-
-
-    foreach($distribusi as $status=>$data)
+    if(!isset($distribusi[$target]))
     {
-        foreach($data['produk'] as $produkKuesioner=>$persen)
-        {
-            $pk = strtolower(str_replace(' ','',$produkKuesioner));
-
-
-            if($produk == $pk)
-            {
-                foreach($data['periode_waktu'] as $waktu=>$nilai)
-                {
-                    $nilai = floatval(str_replace('%','',$nilai));
-
-                    if($nilai > $nilaiTertinggi)
-                    {
-                        $nilaiTertinggi = $nilai;
-                        $waktuTerbesar = $waktu;
-                    }
-                }
-            }
-        }
+        return "-";
     }
 
 
-    return $waktuTerbesar;
+    $data = $distribusi[$target];
+
+
+    $waktu = $data['periode_waktu'];
+
+
+    arsort($waktu);
+
+
+    return array_key_first($waktu);
 }
-
-
 
 }

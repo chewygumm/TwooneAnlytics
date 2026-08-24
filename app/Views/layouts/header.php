@@ -8,6 +8,8 @@
 
     <title><?= $title ?? 'Two One Kopi' ?></title>
 
+    <link rel="icon" type="image/jpeg" href="<?= base_url('logo.jpeg') ?>">
+
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
