@@ -277,7 +277,7 @@ Buat Promosi
 
             <h4 class="text-xl font-bold text-gray-800 mt-1">
                <?= esc(
-                    $item['produk_dominan'] ?? '-'
+                    $item['strategi_promosi']['nama_promo'] ?? '-'
                 ) ?>
             </h4>
 
@@ -421,11 +421,6 @@ Buat Promosi
                     <?= esc($item['rata_rata_transaksi']) ?>
                 </p>
 
-
-                <p>
-                    <b>Ringkasan:</b><br>
-                    <?= esc($item['ringkasan']) ?>
-                </p>
 
 
             </div>

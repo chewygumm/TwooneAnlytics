@@ -1900,20 +1900,18 @@ Mahasiswa:
 
 
 7. Strategi promosi:
-- hanya 1 rekomendasi setiap cluster.
-- Produk dalam strategi promosi WAJIB sama dengan produk_dominan hasil clustering.
-- Jangan mengganti, menambah, atau mengurangi kategori produk.
-- maksimal 10 kata.
-- gunakan format:
-- Nama promo harus dibuat kreatif seperti kampanye marketing cafe.
-- Sesuaikan dengan karakteristik target pelanggan.
+- Hanya 1 rekomendasi setiap cluster.
+- Field produk WAJIB sama persis dengan produk_dominan hasil clustering. Jangan diubah.
+- Field nama_promo WAJIB berbeda dari field produk, dilarang keras sama dengan nama produk.
+- Field nama_promo harus frasa kampanye/marketing yang catchy, maksimal 10 kata, relevan dengan waktu kunjungan dan target pelanggan.
+- Field diskon hanya boleh diskon 10%, diskon 20%, dan paket promo  Paket Hemat: gabungkan harga 2 produk dominan jadi satu harga paket lebih murah menjadi 35000 (hanya boleh digunakan untuk produk yang ada dominan SNACK saja, variasikan tiap cluster. Boleh pakai format: persentase (contoh: diskon 10%, , diskon 20%).
+- Sesuaikan gaya bahasa nama_promo dengan target: santai untuk pelajar/mahasiswa, praktis untuk pekerja.
+- Gunakan gaya berbeda tiap cluster, jangan pakai pola nama_promo yang sama.
 
-[Nama Promo] - [diskon] [produk] [waktu kunjungan] [target pelanggan]
+Contoh strategi_promosi yang benar, jangan disalin, buat variasi baru sesuai data:
+nama_promo: Malam Santai Hemat, diskon: 10%, produk: Kopi + Non-Kopi, waktu: Weekend Malam, target: Mahasiswa
+nama_promo: Nongkrong Sore Hemat, diskon: Paket Hemat Rp35.000, produk: Snack + Kopi, waktu: Weekday Sore, target: Pelajar
 
-Contoh:
-Makan Siang Hemat - diskon 15% kopi dan makanan weekday di jam 12.00 - 14.00 untuk pekerja.
-
-Jangan membuat kalimat panjang.
 Jangan menjelaskan alasan atau tujuan promosi.
 Target promosi hanya boleh menggunakan: Mahasiswa, Pelajar, Pekerja diambil sesuai informasi pendukung kuesioner
 
@@ -1921,6 +1919,7 @@ Jangan membuat:
 - bundling
 - kombinasi produk
 - nama segmen berdasarkan usia/status/waktu
+- nama_promo yang sama dengan field produk
 
 8. Penentuan target pelanggan:
 Target pelanggan ditentukan berdasarkan kesesuaian produk dominan cluster dengan distribusi produk pada ringkasan kuesioner.
@@ -1933,6 +1932,7 @@ Waktu kunjungan ditentukan berdasarkan distribusi kunjungan target pelanggan pad
 Contoh:
 Jika Pekerja memiliki kunjungan dominan Weekday dan periode waktu siang, maka waktu promosi = Weekday siang.
 
+
 FORMAT JSON:
 
 [
@@ -1943,7 +1943,7 @@ FORMAT JSON:
 \"jumlah_transaksi\":\"\",
 \"pola_hari\":\"\",
 \"rata_rata_transaksi\":\"\",
-\"ringkasan\":\"\",
+
 
 \"informasi_pendukung\":{
 
