@@ -139,7 +139,7 @@
 
                 <p class="px-4 text-xs font-semibold uppercase tracking-wider text-gray-400">
 
-                    Pengolahan Data
+                    Promosi
 
                 </p>
 
@@ -156,7 +156,7 @@
                 text-[#1f4735]
                 hover:bg-[#e8f0eb] transition">
 
-                    Analisis Data
+                    Promosi
 
                 </a>
 

@@ -27,6 +27,8 @@ $routes->get('kategori-produk/hapus/(:num)','KategoriProduk::hapus/$1');
 // ANALISIS DATA
 $routes->get('analisis-data', 'AnalisisData::index');
 $routes->get('analisis-data/proses', 'AnalisisData::proses');
+
+$routes->post('analisis-data/proses', 'AnalisisData::proses');
 $routes->get('analisis-data/reset', 'AnalisisData::reset');
 $routes->get('analisis-data/detail', 'AnalisisData::detail');
 $routes->get('analisis-data/history', 'AnalisisData::history');

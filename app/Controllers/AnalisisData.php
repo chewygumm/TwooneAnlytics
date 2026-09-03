@@ -1033,51 +1033,90 @@ foreach($rows as $row)
         */
 
 
-        $kOptimal=4;
+        $kOptimal = $this->request->getPost('jumlah_cluster');
 
+        if(empty($kOptimal)){
+            $kOptimal = 4;
+        }
+
+        $kOptimal = (int)$kOptimal;
+
+        if($kOptimal < 2)
+        {
+            return redirect()
+            ->back()
+            ->with(
+                'error',
+                'Jumlah cluster minimal 2.'
+            );
+        }
 //dd($dataset[0]);
 
 
-$centroid = [
+if($kOptimal == 4)
+{
 
-[
-'hari'=>0,
-'menu_kopi'=>0.2,
-'menu_non_kopi'=>0.2,
-'menu_makanan'=>0.2,
-'menu_snack'=>0.25,
-'total_normalisasi'=>0.094
-],
+    $centroid = [
 
-[
-'hari'=>1,
-'menu_kopi'=>0.2,
-'menu_non_kopi'=>0.2,
-'menu_makanan'=>0,
-'menu_snack'=>0.5,
-'total_normalisasi'=>0.118
-],
+        [
+            'hari'=>0,
+            'menu_kopi'=>0.2,
+            'menu_non_kopi'=>0.2,
+            'menu_makanan'=>0.2,
+            'menu_snack'=>0.25,
+            'total_normalisasi'=>0.094
+        ],
 
-[
-'hari'=>1,
-'menu_kopi'=>0.2,
-'menu_non_kopi'=>0,
-'menu_makanan'=>0.2,
-'menu_snack'=>0,
-'total_normalisasi'=>0.060
-],
+        [
+            'hari'=>1,
+            'menu_kopi'=>0.2,
+            'menu_non_kopi'=>0.2,
+            'menu_makanan'=>0,
+            'menu_snack'=>0.5,
+            'total_normalisasi'=>0.118
+        ],
 
-[
-'hari'=>0,
-'menu_kopi'=>0,
-'menu_non_kopi'=>0.2,
-'menu_makanan'=>0,
-'menu_snack'=>0,
-'total_normalisasi'=>0.032
-]
+        [
+            'hari'=>1,
+            'menu_kopi'=>0.2,
+            'menu_non_kopi'=>0,
+            'menu_makanan'=>0.2,
+            'menu_snack'=>0,
+            'total_normalisasi'=>0.060
+        ],
 
-];
+        [
+            'hari'=>0,
+            'menu_kopi'=>0,
+            'menu_non_kopi'=>0.2,
+            'menu_makanan'=>0,
+            'menu_snack'=>0,
+            'total_normalisasi'=>0.032
+        ]
 
+    ];
+
+}
+else
+{
+
+    $centroid = [];
+
+    $randomIndex = array_rand($dataset, $kOptimal);
+
+    foreach($randomIndex as $index)
+    {
+        $centroid[] = [
+            'hari'=>$dataset[$index]['hari'],
+            'menu_kopi'=>$dataset[$index]['menu_kopi'],
+            'menu_non_kopi'=>$dataset[$index]['menu_non_kopi'],
+            'menu_makanan'=>$dataset[$index]['menu_makanan'],
+            'menu_snack'=>$dataset[$index]['menu_snack'],
+            'total_normalisasi'=>$dataset[$index]['total_normalisasi']
+        ];
+    }
+
+}
 
 
         $berubah=true;
@@ -1643,13 +1682,9 @@ array_sum($silhouette) / count($silhouette)
 
         ]);
 
-         session()->setFlashdata(
-        'success',
-        'Analisis data berhasil dilakukan'
-    );
-
-
-    return redirect()->to('/analisis-data');
+        // Setelah clustering selesai, langsung lanjut ke proses interpretasi LLM.
+        // Dengan begitu pengguna tidak perlu menekan tombol "Buat Promosi" lagi.
+        return redirect()->to('/analisis-data/generate');
 
 
     
@@ -2184,9 +2219,6 @@ foreach($hasil as $row)
     'nama_segmen' => 
         $row['nama_segmen'],
 
-
-    'karakteristik' => 
-        $row['ringkasan'],
 
 
     'informasi_pendukung' => 

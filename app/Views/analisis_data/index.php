@@ -19,39 +19,51 @@
             <section class="mt-6">
 
 
-                <!-- BUTTON -->
-<div class="mb-6 flex items-center justify-between">
+ <div class="mb-6 flex items-end justify-between">
 
-    <div class="flex gap-3">
+    <div class="flex items-end gap-3">
 
-        <a href="<?= base_url('analisis-data/proses') ?>"
-           class="inline-flex items-center justify-center rounded-full border border-green-800 bg-green-800 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-green-900">
+        <form action="<?= base_url('analisis-data/proses') ?>" method="post" class="flex items-end gap-3">
 
-            Analisis Data
+            <?= csrf_field() ?>
 
-        </a>
+            <div>
+                <label for="jumlah_cluster" class="mb-2 block text-sm font-medium text-gray-700">
+                    Jumlah Promosi
+                </label>
 
+                <input
+                    type="number"
+                    id="jumlah_cluster"
+                    name="jumlah_cluster"
+                    min="2"
+                    value="4"
+                    required
+                    class="w-20 rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-green-700 focus:outline-none focus:ring-1 focus:ring-green-700"
+                >
+            </div>
+
+            <button type="submit"
+                    class="inline-flex items-center justify-center rounded-full border border-green-800 bg-green-800 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-green-900">
+              Buat Promosi
+            </button>
+
+        </form>
 
         <a href="<?= base_url('analisis-data/reset') ?>"
            onclick="return confirm('Hapus hasil clustering?')"
            class="inline-flex items-center justify-center rounded-full border border-red-600 bg-red-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700">
-
             Reset
-
         </a>
 
     </div>
 
-
-    <div class="flex gap-4">
-
+    <div>
         <a href="<?= base_url('analisis-data/detail') ?>"
            class="text-green-700 underline">
-
             Lihat Detail
-
         </a>
-
+    
 
     </div>
 
@@ -60,135 +72,6 @@
 
 
 
-            <!-- RINGKASAN DETAIL CLUSTER -->
-
-<div class="mb-6 rounded-xl bg-white p-6 shadow">
-
-
-    <h3 class="mb-5 text-lg font-semibold text-gray-800">
-
-        Analisis Karakteristik Cluster
-
-    </h3>
-
-
-    <div class="overflow-x-auto">
-
-
-        <table class="w-full text-sm">
-
-
-            <thead class="bg-primary text-white">
-
-                <tr>
-
-                    <th class="px-4 py-3">
-                        Cluster
-                    </th>
-
-                    <th class="px-4 py-3">
-                        Jumlah Transaksi
-                    </th>
-
-                    <th class="px-4 py-3">
-                        Produk Dominan
-                    </th>
-
-                    <th class="px-4 py-3">
-                        Hari Dominan
-                    </th>
-
-                    <th class="px-4 py-3">
-                        Total Transaksi
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-
-            <?php if(!empty($karakteristik)): ?>
-
-
-                <?php foreach($karakteristik as $row): ?>
-
-
-                <tr class="border-b hover:bg-gray-50">
-
-
-                    <td class="px-4 py-3 text-center font-semibold">
-
-                        <?= esc($row['cluster']) ?>
-
-                    </td>
-
-
-
-                    <td class="px-4 py-3 text-center">
-
-                        <?= esc($row['jumlah']) ?> data
-
-                    </td>
-
-
-
-                    <td class="px-4 py-3 text-center">
-
-                        <?= esc($row['produk_dominan']) ?>
-
-                    </td>
-
-
-
-                    <td class="px-4 py-3 text-center">
-                        <?= esc($row['hari_dominan'] ?? '-') ?>
-                    </td>
-
-
-
-                    <td class="px-4 py-3 text-center">
-
-                        Rp <?= number_format($row['rata_rata'],0,',','.') ?>
-
-                    </td>
-
-
-                </tr>
-
-
-                <?php endforeach; ?>
-
-
-            <?php else: ?>
-
-
-                <tr>
-
-                    <td colspan="5" class="py-8 text-center text-gray-500">
-
-                        Belum ada ringkasan cluster
-
-                    </td>
-
-                </tr>
-
-
-            <?php endif; ?>
-
-
-            </tbody>
-
-
-        </table>
-
-
-    </div>
-
-
-</div>
 <!-- ==========================
 HASIL INTERPRETASI LLM
 ========================== -->
@@ -206,12 +89,6 @@ HASIL INTERPRETASI LLM
 
 
 
-<a href="<?= base_url('analisis-data/generate') ?>"
-class="bg-primary text-white px-4 py-2 rounded-lg">
-
-Buat Promosi
-
-</a>
 
 
 </div>
@@ -243,9 +120,6 @@ Buat Promosi
                 </h3>
 
 
-                <p class="text-xs text-gray-500 mt-1">
-                    Cluster <?= esc($item['cluster']) ?>
-                </p>
 
             </div>
 
@@ -365,70 +239,6 @@ Buat Promosi
 
 
 
-        <!-- Button Detail -->
-
-        <button
-        onclick="toggleDetail('detail<?= $item['cluster'] ?>')"
-        class="mt-5 flex w-full items-center justify-center gap-2
-               rounded-lg border border-green-700 
-               py-2 text-sm font-semibold text-green-700
-               hover:bg-green-700 hover:text-white transition">
-
-
-            Lihat Detail Cluster ▼
-
-
-        </button>
-
-
-
-
-        <!-- Dropdown Detail -->
-
-        <div id="detail<?= $item['cluster'] ?>"
-             class="hidden mt-4 rounded-xl bg-gray-50 p-4 text-sm">
-
-
-            <h4 class="font-bold text-gray-800 mb-3">
-                Detail Hasil Clustering
-            </h4>
-
-
-
-            <div class="space-y-2">
-
-
-                <p>
-                    <b>Produk Dominan:</b>
-                    <?= esc($item['produk_dominan']) ?>
-                </p>
-
-
-                <p>
-                    <b>Jumlah Transaksi:</b>
-                    <?= esc($item['jumlah_transaksi']) ?>
-                </p>
-
-
-                <p>
-                    <b>Pola Hari:</b>
-                    <?= esc($item['pola_hari']) ?>
-                </p>
-
-
-                <p>
-                    <b>Rata-rata Transaksi:</b>
-                    <?= esc($item['rata_rata_transaksi']) ?>
-                </p>
-
-
-
-            </div>
-
-
-        </div>
-
-
     </div>
 
 
@@ -436,101 +246,6 @@ Buat Promosi
 
 
 <?php endforeach; ?>
-
-
-</div>
-
-
-
-<!-- ==========================
-INFORMASI PENDUKUNG KUESIONER
-========================== -->
-
-
-<div class="mt-6 rounded-xl border bg-white shadow p-5">
-
-
-<h3 class="font-bold text-lg mb-4">
-Informasi Pendukung Kuesioner
-</h3>
-
-<?php 
-$info = [];
-
-foreach($hasil_llm as $item){
-    if(isset($item['informasi_pendukung'])){
-        $info = $item['informasi_pendukung'];
-        break;
-    }
-}
-?>
-
-<div class="text-sm space-y-2">
-
-<?php if(isset($info['pekerja'])): ?>
-
-<p class="font-semibold">
-Pekerja
-</p>
-
-<p>
-• Kunjungan :
-<?= $info['pekerja']['kunjungan'] ?? '-' ?>
-</p>
-
-<p>
-• Produk :
-<?= $info['pekerja']['produk'] ?? '-' ?>
-</p>
-<br>
-<?php endif; ?>
-
-<?php if(isset($info['mahasiswa'])): ?>
-
-<p class="font-semibold">
-Mahasiswa
-</p>
-
-<p>
-• Kunjungan :
-<?= $info['mahasiswa']['kunjungan'] ?? '-' ?>
-</p>
-
-<p>
-• Produk :
-<?= $info['mahasiswa']['produk'] ?? '-' ?>
-</p>
-
-<br>
-
-<?php endif; ?>
-
-
-
-<?php if(isset($info['pelajar'])): ?>
-
-<p class="font-semibold">
-Pelajar
-</p>
-
-<p>
-• Kunjungan :
-<?= $info['pelajar']['kunjungan'] ?? '-' ?>
-</p>
-
-<p>
-• Produk :
-<?= $info['pelajar']['produk'] ?? '-' ?>
-</p>
-
-<br>
-
-<?php endif; ?>
-
-
-
-
-</div>
 
 
 </div>
@@ -556,26 +271,7 @@ Belum ada hasil interpretasi.
 
 </section>
 
-<script>
 
-function toggleDetail(id)
-{
-
-    let detail = document.getElementById(id);
-
-
-    if(detail.classList.contains('hidden'))
-    {
-        detail.classList.remove('hidden');
-    }
-    else
-    {
-        detail.classList.add('hidden');
-    }
-
-}
-
-</script>
 
 
       <!-- Loading Overlay -->
@@ -622,32 +318,11 @@ function toggleDetail(id)
 
         function showLoading(text)
         {
-
             document.getElementById('loadingText').innerHTML = text;
 
-
-            let loading = document.getElementById('loading');
-            let bar = document.getElementById('progressBar');
-
-
+            const loading = document.getElementById('loading');
             loading.classList.remove('hidden');
             loading.classList.add('flex');
-
-
-            let progress = 0;
-
-            progressInterval = setInterval(function(){
-
-                if(progress < 90)
-                {
-                    progress += Math.random() * 10;
-
-                    bar.style.width = progress + "%";
-                }
-
-
-            },300);
-
         }
 
 
@@ -657,22 +332,12 @@ function toggleDetail(id)
         ?.addEventListener('click',function(){
 
             showLoading(
-                'Sedang melakukan proses analisis data...'
+                'Sedang melakukan analisis data dan membuat rekomendasi promosi...'
             );
 
         });
+`
 
-
-
-        // Generate LLM
-        document.querySelector('a[href*="analisis-data/generate"]')
-        ?.addEventListener('click',function(){
-
-            showLoading(
-                'Sedang membuat interpretasi LLM...'
-            );
-
-        });
 
 
 </script>

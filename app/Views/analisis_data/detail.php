@@ -642,77 +642,94 @@ DETAIL CLUSTERING
 <h3 class="font-semibold mb-5 text-gray-800">
 Detail Clustering
 </h3>
+
+<!-- ==========================
+RINGKASAN KARAKTERISTIK CLUSTER
+========================== -->
+
+<div class="mb-8">
+    <h4 class="font-semibold mb-3 text-gray-800">
+        Ringkasan Karakteristik Cluster
+    </h4>
 <p class="text-sm text-gray-600 mb-4">
     Jumlah cluster optimal yang digunakan adalah 
     <b>K = <?= count($centroid) ?></b>
 </p>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th class="p-3 text-center">Cluster</th>
+                    <th class="p-3 text-center">Jumlah Transaksi</th>
+                    <th class="p-3 text-center">Produk Dominan</th>
+                    <th class="p-3 text-center">Hari Dominan</th>
+                    <th class="p-3 text-center">Rata-rata Transaksi</th>
+                </tr>
+            </thead>
 
-<!-- JUMLAH DATA CLUSTER -->
+            <tbody>
+                <?php
+                /*
+                 * Nilai centroid produk:
+                 * menu_kopi, menu_non_kopi, menu_makanan, menu_snack.
+                 * Nilai hari_encode: 0 = Weekday, 1 = Weekend.
+                 * Nilai total pada centroid merupakan hasil normalisasi Min-Max.
+                 */
+                $minTotal = 1000;
+                $maxTotal = 468000;
 
-<table class="w-full text-sm mb-8">
+                foreach ($centroid as $row):
+                    $nilaiProduk = [
+                        'Kopi'     => (float) ($row['menu_kopi'] ?? 0),
+                        'Non-Kopi' => (float) ($row['menu_non_kopi'] ?? 0),
+                        'Makanan'  => (float) ($row['menu_makanan'] ?? 0),
+                        'Snack'    => (float) ($row['menu_snack'] ?? 0),
+                    ];
 
+                    arsort($nilaiProduk);
+                    $produkDominan = array_key_first($nilaiProduk);
 
-<thead class="bg-primary text-white">
+                    $hariDominan = ((float) ($row['hari_encode'] ?? 0) >= 0.5)
+                        ? 'Weekend'
+                        : 'Weekday';
 
-<tr>
+                    $totalNormalisasi = (float) ($row['total'] ?? 0);
+                    $rataTransaksi = $minTotal +
+                        ($totalNormalisasi * ($maxTotal - $minTotal));
 
-<th class="p-3">
-Cluster
-</th>
+                    $jumlahDataCluster = 0;
+                    foreach ($cluster as $dataCluster) {
+                        if ((string) ($dataCluster['cluster'] ?? '') === (string) ($row['cluster'] ?? '')) {
+                            $jumlahDataCluster++;
+                        }
+                    }
+                ?>
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-3 text-center font-semibold">
+                        <?= esc($row['cluster'] ?? '-') ?>
+                    </td>
 
-<th class="p-3">
-Jumlah Data
-</th>
+                    <td class="p-3 text-center">
+                        <?= number_format($jumlahDataCluster, 0, ',', '.') ?> data
+                    </td>
 
-</tr>
+                    <td class="p-3 text-center">
+                        <?= esc($produkDominan) ?>
+                    </td>
 
-</thead>
+                    <td class="p-3 text-center">
+                        <?= esc($hariDominan) ?>
+                    </td>
 
-
-<tbody>
-
-
-<?php
-
-$jumlahCluster=[];
-
-
-foreach($cluster as $row){
-
-    $jumlahCluster[$row['cluster']] =
-    ($jumlahCluster[$row['cluster']] ?? 0)+1;
-
-}
-
-
-?>
-
-
-<?php foreach($jumlahCluster as $c=>$jumlah): ?>
-
-
-<tr class="border-b">
-
-<td class="p-3 text-center font-semibold">
-<?= $c ?>
-</td>
-
-
-<td class="p-3 text-center">
-<?= $jumlah ?> data
-</td>
-
-
-</tr>
-
-
-<?php endforeach ?>
-
-
-</tbody>
-
-
-</table>
+                    <td class="p-3 text-center">
+                        Rp <?= number_format($rataTransaksi, 0, ',', '.') ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 
 
